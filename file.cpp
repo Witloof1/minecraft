@@ -22,6 +22,7 @@ int cerp(float y1, float y2, float x)
 
 World::World()
 {
+	nWorld = new int8_t[nWorldWidth * nWorldHeight];
 	fDirtSeed.reserve(nSeedSize);
 	fStoneSeed.reserve(nSeedSize);
 
@@ -30,6 +31,7 @@ World::World()
 
 World::~World()
 {
+	delete[] nWorld;
 }
 
 int8_t World::getBlock(int x, int y)
@@ -50,9 +52,6 @@ void World::fillSeed(std::vector<float>& fSeed, int min, int max, int nOffset)
 	for (int i = 0; i != nSeedSize; ++i)
 	{
 		nLehmer = i + nOffset;
-		// DEBUG (tree: 3): value went from zero to very large float
-		// changed (min - max) to (max - min)
-		// now it seems to work
 		fSeed[i] = min + Lehmer32() % (max - min);
 	}
 }
@@ -70,19 +69,19 @@ void World::generateTerrain(const int& nPlayerPosX)
 {
 	int nOffset = nPlayerPosX / nSeedPointsDist;
 
-	fillSeed(fDirtSeed, 40, 80, nOffset); // DEBUG (tree: 2): fDirtSeed[i] is very large float (3.69768e+09)
+	fillSeed(fDirtSeed, 40, 80, nOffset);
 	fillSeed(fStoneSeed, 0, 40, nOffset);
 
 	for (int i = 0; i != nSeedSize - 1; ++i)
 	{
 		for (int p = 0; p != nSeedPointsDist; ++p)
 		{
-			int dirtHeight = nWorldHeight - cerp(fDirtSeed[i], fDirtSeed[i + 1], (i * nSeedSize + p) / nSeedPointsDist); // DEBUG (tree: 1): cerp is min int, why??
+			int dirtHeight = nWorldHeight - cerp(fDirtSeed[i], fDirtSeed[i + 1], (i * nSeedSize + p) / nSeedPointsDist);
 			int stoneHeight = nWorldHeight - cerp(fStoneSeed[i], fStoneSeed[i + 1], (i * nSeedSize + p) / nSeedPointsDist);
 
 			// -nSeedPointsDist because there is a seed point to the left of the screen
-			int x = -nSeedPointsDist + i * nSeedPointsDist + x - nPlayerPosX % nSeedPointsDist;
-
+			int x = -nSeedPointsDist + i * nSeedPointsDist + p - nPlayerPosX % nSeedPointsDist;
+			std::cout << "x: " << x << std::endl;
 			int y = 0;
 			for (; y != dirtHeight; ++y)
 				setBlock(x, y, 0); // from top to dirtHeight -> sky

@@ -40,7 +40,7 @@ private:
 	const int nSeedPointsDist = 40;
 	const int nSeedSize = nWorldWidth / nSeedPointsDist + 2;
 
-	std::unique_ptr<int8_t[]> nWorld { new int8_t[nWorldWidth * nWorldHeight] };
+	int8_t* nWorld;
 	std::vector<float> fDirtSeed;
 	std::vector<float> fStoneSeed;
 

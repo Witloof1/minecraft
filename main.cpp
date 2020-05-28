@@ -36,8 +36,6 @@ int main()
 				window.close();
 			if (window.hasFocus())
 			{
-				//player.t_setVel({ 0.0f, 0.0f });
-
 				if (event.type == sf::Event::KeyPressed)
 				{
 					if (event.key.code == sf::Keyboard::Up)
