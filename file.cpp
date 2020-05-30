@@ -12,9 +12,8 @@ uint32_t Lehmer32()		// random number generator
 	return m2;
 }
 
-int cerp(float y1, float y2, float x)
+int cerp(float y1, float y2, float a)
 {
-	float a = x - (int)x;
 	float g = (1 - cos(3.14159265 * a)) / 2;
 	
 	return (1 - g) * y1 + a * y2;
@@ -25,6 +24,11 @@ World::World()
 	nWorld = new int8_t[nWorldWidth * nWorldHeight];
 	fDirtSeed.reserve(nSeedSize);
 	fStoneSeed.reserve(nSeedSize);
+
+	std::cout << "nSeedSize: " << nSeedSize << std::endl;
+	std::cout << "nVisibleBlocksX: " << nVisibleBlocksX << std::endl;
+	std::cout << "nScreenWidth: " << nScreenWidth << std::endl;
+
 
 	block.setSize({ (float)nBlockWidth, (float)nBlockHeight });
 }
@@ -70,18 +74,16 @@ void World::generateTerrain(const int& nPlayerPosX)
 	int nOffset = nPlayerPosX / nSeedPointsDist;
 
 	fillSeed(fDirtSeed, 40, 80, nOffset);
-	fillSeed(fStoneSeed, 0, 40, nOffset);
+	fillSeed(fStoneSeed, 0, 50, nOffset);
 
 	for (int i = 0; i != nSeedSize - 1; ++i)
 	{
 		for (int p = 0; p != nSeedPointsDist; ++p)
 		{
-			int dirtHeight = nWorldHeight - cerp(fDirtSeed[i], fDirtSeed[i + 1], (i * nSeedSize + p) / nSeedPointsDist);
-			int stoneHeight = nWorldHeight - cerp(fStoneSeed[i], fStoneSeed[i + 1], (i * nSeedSize + p) / nSeedPointsDist);
+			int dirtHeight = nWorldHeight - cerp(fDirtSeed[i], fDirtSeed[i + 1], (float)p / (float)nSeedPointsDist);
+			int stoneHeight = nWorldHeight - cerp(fStoneSeed[i], fStoneSeed[i + 1], (float)p / (float)nSeedPointsDist);
 
-			// -nSeedPointsDist because there is a seed point to the left of the screen
 			int x = -nSeedPointsDist + i * nSeedPointsDist + p - nPlayerPosX % nSeedPointsDist;
-			std::cout << "x: " << x << std::endl;
 			int y = 0;
 			for (; y != dirtHeight; ++y)
 				setBlock(x, y, 0); // from top to dirtHeight -> sky
@@ -98,9 +100,9 @@ void World::generateTerrain(const int& nPlayerPosX)
 
 void World::displayWorld(sf::RenderWindow& window)
 {
-	for (int x = 0; x < nVisibleBlocksX; x++)
+	for (int x = 0; x < nVisibleBlocksX + 1; x++)
 	{
-		for (int y = 0; y < nVisibleBlocksY; y++)
+		for (int y = 0; y < nVisibleBlocksY + 2; y++)
 		{
 			int8_t nTileID = getBlock(x, y + vOffset.y);
 			block.setPosition(x * nBlockWidth - vBlockOffset.x, y * nBlockHeight - vBlockOffset.y);

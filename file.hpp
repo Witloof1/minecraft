@@ -38,7 +38,7 @@ private:
 	const int nWorldHeight = 128;
 	
 	const int nSeedPointsDist = 40;
-	const int nSeedSize = nWorldWidth / nSeedPointsDist + 2;
+	const int nSeedSize = nWorldWidth / nSeedPointsDist + 3;
 
 	int8_t* nWorld;
 	std::vector<float> fDirtSeed;
@@ -49,7 +49,6 @@ private:
 
 	void fillSeed(std::vector<float>&, int, int, int);
 
-	// ============ TEMPORARY ============ //
 	sf::RectangleShape block;
 };
 
