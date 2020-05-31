@@ -10,24 +10,24 @@ public:
 	Player(const World&);
 	~Player();
 
-	sf::Vector2f pos() { return vPos; }
+	sf::Vector2f pos() const { return vPos; }
 	void left();
 	void right();
 	void jump();
-	void t_down();
 
-	void move(const float& fElapsedTime);
+	void move();
 	void collision(const float& fElapsedTime);
 	void display(sf::RenderWindow& window);
-
-	void t_setVel(sf::Vector2f vel) { vVel = vel; }
 
 private:
 	const World& world;
 
-	sf::Vector2f vPos { 64.0f, 64.0f };
+	sf::Vector2f vPos { 128.0f, 40.0f };
 	sf::Vector2f vVel { 0.0f, 0.0f };
 	sf::Vector2f vAcc { 0.0f, 0.0f };
+	sf::Vector2f vFriction { 0.9f, 1.0f };
+
+	bool bOnGround;
 
 	sf::RectangleShape playerRect;
 };

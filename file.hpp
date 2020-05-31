@@ -14,7 +14,7 @@ public:
 	World();
 	~World();
 
-	int8_t getBlock(int, int);
+	int8_t getBlock(int, int) const;
 	void setBlock(int, int, int8_t);
 
 	sf::Vector2f blockSize() const { return { (float)nBlockWidth, (float)nBlockHeight }; }
@@ -25,8 +25,8 @@ public:
 	void displayWorld(sf::RenderWindow&);
 
 private:
-	const int nBlockWidth = 64;
-	const int nBlockHeight = 64;
+	const int nBlockWidth = 32;
+	const int nBlockHeight = 32;
 
 	const int nScreenWidth  = sf::VideoMode::getFullscreenModes()[0].width;
 	const int nScreenHeight = sf::VideoMode::getFullscreenModes()[0].height;

@@ -34,27 +34,23 @@ int main()
 		{
 			if (event.type == sf::Event::Closed)
 				window.close();
-			if (window.hasFocus())
-			{
-				if (event.type == sf::Event::KeyPressed)
-				{
-					if (event.key.code == sf::Keyboard::Up)
-						player.jump();
-					if (event.key.code == sf::Keyboard::Down)
-						player.t_down();
-					if (event.key.code == sf::Keyboard::Left)
-						player.left();
-					if (event.key.code == sf::Keyboard::Right)
-						player.right();
-				}
-			}
+		}
+
+		if (window.hasFocus())
+		{
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+				player.left();
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+				player.right();
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+				player.jump();
 		}
 
 		window.clear(sf::Color(135, 206, 235));
 
 		float fElapsedTime = clock.restart().asSeconds();
-		//player.collision(fElapsedTime);
-		player.move(fElapsedTime);
+		player.move();
+		player.collision(fElapsedTime);
 		
 		world.calculateOffsets(player.pos());
 		world.generateTerrain(player.pos().x);

@@ -12,7 +12,7 @@ uint32_t Lehmer32()		// random number generator
 	return m2;
 }
 
-int cerp(float y1, float y2, float a)
+int cerp(float y1, float y2, float a)	// cosine interpolation
 {
 	float g = (1 - cos(3.14159265 * a)) / 2;
 	
@@ -38,7 +38,7 @@ World::~World()
 	delete[] nWorld;
 }
 
-int8_t World::getBlock(int x, int y)
+int8_t World::getBlock(int x, int y) const
 {
 	if (x >= 0 && x < nWorldWidth && y >= 0 && y < nWorldHeight)
 		return nWorld[y * nWorldWidth + x];
@@ -74,7 +74,7 @@ void World::generateTerrain(const int& nPlayerPosX)
 	int nOffset = nPlayerPosX / nSeedPointsDist;
 
 	fillSeed(fDirtSeed, 40, 80, nOffset);
-	fillSeed(fStoneSeed, 0, 50, nOffset);
+	fillSeed(fStoneSeed, 30, 60, nOffset);
 
 	for (int i = 0; i != nSeedSize - 1; ++i)
 	{
@@ -85,13 +85,13 @@ void World::generateTerrain(const int& nPlayerPosX)
 
 			int x = -nSeedPointsDist + i * nSeedPointsDist + p - nPlayerPosX % nSeedPointsDist;
 			int y = 0;
-			for (; y != dirtHeight; ++y)
+			for (; y < dirtHeight; ++y)
 				setBlock(x, y, 0); // from top to dirtHeight -> sky
 
-			for (; y != stoneHeight; ++y)
+			for (; y < stoneHeight; ++y)
 				setBlock(x, y, 1); // from dirtHeight to stoneHeight -> dirt
 
-			for (; y != nWorldHeight; ++y)
+			for (; y < nWorldHeight; ++y)
 				setBlock(x, y, 2); // from stoneHeight to bottom -> stone
 
 		}
