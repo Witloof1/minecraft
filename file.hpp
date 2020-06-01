@@ -16,6 +16,7 @@ public:
 
 	int8_t getBlock(int, int) const;
 	void setBlock(int, int, int8_t);
+	void breakBlock(int, int);
 
 	sf::Vector2f blockSize() const { return { (float)nBlockWidth, (float)nBlockHeight }; }
 	sf::Vector2f offset() const { return vOffset; }
@@ -25,8 +26,8 @@ public:
 	void displayWorld(sf::RenderWindow&);
 
 private:
-	const int nBlockWidth = 32;
-	const int nBlockHeight = 32;
+	const int nBlockWidth = 64;
+	const int nBlockHeight = 64;
 
 	const int nScreenWidth  = sf::VideoMode::getFullscreenModes()[0].width;
 	const int nScreenHeight = sf::VideoMode::getFullscreenModes()[0].height;
@@ -34,7 +35,7 @@ private:
 	const int nVisibleBlocksX = nScreenWidth / nBlockWidth;
 	const int nVisibleBlocksY = nScreenHeight / nBlockHeight;
 
-	const int nWorldWidth = nVisibleBlocksX;
+	const int nWorldWidth = nVisibleBlocksX + 1;
 	const int nWorldHeight = 128;
 	
 	const int nSeedPointsDist = 40;
@@ -49,7 +50,13 @@ private:
 
 	void fillSeed(std::vector<float>&, int, int, int);
 
-	sf::RectangleShape block;
+	std::vector<sf::Vector2i> brokenBlocks;
+
+	sf::Texture t1;
+	sf::Sprite dirt;
+
+	sf::Texture t2;
+	sf::Sprite stone;
 };
 
 #endif /* world_hpp */

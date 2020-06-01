@@ -1,8 +1,13 @@
 #include "player.hpp"
 
-Player::Player(const World& _world) : world(_world)
+Player::Player(World& _world) : world(_world)
 {
 	playerRect.setSize(world.blockSize());
+
+	if (vMaxVel.x > world.blockSize().x)
+		std::cout << "vMaxVel.x should be smaller than world.blockSize().x" << std::endl;
+	if (vMaxVel.y > world.blockSize().y)
+		std::cout << "vMaxVel.y should be smaller than world.blockSize().y" << std::endl;
 }
 
 Player::~Player()
@@ -12,6 +17,7 @@ Player::~Player()
 void Player::left()  { vAcc.x -= 12.0f; }
 void Player::right() { vAcc.x += 12.0f; }
 void Player::jump()  { if (bOnGround) vVel.y -= 36.0f; }
+void Player::down()  { vPos.x = round(vPos.x); }
 
 void Player::move()
 {
@@ -23,17 +29,19 @@ void Player::move()
 	vVel.y *= vFriction.y;
 
 	// Clamp velocities
-	if (vVel.x > world.blockSize().x)
-		vVel.x = world.blockSize().x;
-	if (vVel.x < -world.blockSize().x)
-		vVel.x = -world.blockSize().x;
+	if (vVel.x > vMaxVel.x)
+		vVel.x = vMaxVel.x;
+	else if (vVel.x < -vMaxVel.x)
+		vVel.x = -vMaxVel.x;
 
-	if (vVel.y > world.blockSize().y)
-		vVel.y = world.blockSize().y;
-	if (vVel.y < -world.blockSize().y)
-		vVel.y = -world.blockSize().y;
+	if (vVel.y > vMaxVel.y)
+		vVel.y = vMaxVel.x;
+	else if (vVel.y < -vMaxVel.x)
+		vVel.y = -vMaxVel.x;
 
 	vAcc = { 0.0f, 0.0f };
+
+	vScreenPos = { (vPos.x - world.offset().x) * world.blockSize().x, (vPos.y - world.offset().y) * world.blockSize().y };
 }
 
 void Player::collision(const float& fElapsedTime)
@@ -76,7 +84,7 @@ void Player::collision(const float& fElapsedTime)
 			fNewPosY = (int)fNewPosY;
 			vVel.y = 0;
 			bOnGround = true;
-			vFriction.x = 0.9f;
+			vFriction.x = 0.6f;
 		}
 	}
 
@@ -84,8 +92,44 @@ void Player::collision(const float& fElapsedTime)
 	vPos.y = fNewPosY;
 }
 
+void Player::defineRayAngle(sf::Vector2f vMouse)
+{
+	sf::Vector2f vToMouse = vMouse - vScreenPos;
+	sf::Vector2f vUp { 0.0f, 1.0f };
+
+	fRayAngle = (3.14159265f / 2) + atan2(vToMouse.y, vToMouse.x) - atan2(vUp.y, vUp.x);
+}
+
+void Player::castRay()
+{
+	for (float fProg = 0.0f; fProg < fMaxReachability; fProg+=0.5)
+	{
+		vTestPoint.x = vPos.x - world.offset().x + cos(fRayAngle) * fProg;
+		vTestPoint.y = vPos.y + sin(fRayAngle) * fProg;
+
+		if (world.getBlock(vTestPoint.x, vTestPoint.y) != 0)
+		{
+			world.breakBlock(vTestPoint.x , vTestPoint.y);
+			break;
+		}
+	}
+}
+
+void Player::drawRay(sf::RenderWindow& window)
+{
+	sf::Vertex ray[2]
+	{
+		sf::Vertex(vScreenPos + sf::Vector2f(playerRect.getSize().x / 2, playerRect.getSize().y / 2)),
+		sf::Vertex({ vTestPoint.x * world.blockSize().x, (vTestPoint.y - world.offset().y) * world.blockSize().y})
+	};
+
+	window.draw(ray, 2, sf::Lines);
+}
+
 void Player::display(sf::RenderWindow& window)
 {
 	playerRect.setPosition((vPos.x - world.offset().x) * world.blockSize().x, (vPos.y - world.offset().y) * world.blockSize().y);
 	window.draw(playerRect); 
+
+	drawRay(window);
 }

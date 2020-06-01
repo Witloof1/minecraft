@@ -12,6 +12,8 @@ int main()
 {
 	sf::RenderWindow window(sf::VideoMode(nWIDTH, nHEIGHT), "minecraft 2D", sf::Style::Fullscreen);
 	window.setFramerateLimit(60);
+	//window.setMouseCursorVisible(false);
+	window.setVerticalSyncEnabled(true);
 
 	sf::Clock clock;
 
@@ -27,13 +29,28 @@ int main()
 	
 	Player player(world);
 
+	sf::Vector2f vMouse;
+
 	while (window.isOpen())
 	{
+		vMouse = { (float)sf::Mouse::getPosition(window).x, (float)sf::Mouse::getPosition(window).y };
+
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed)
 				window.close();
+			if (event.type == sf::Event::MouseButtonPressed)
+				if (event.mouseButton.button == sf::Mouse::Left)
+               	{
+               		player.defineRayAngle(vMouse);
+					player.castRay();
+				}
+		}
+
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Button(sf::Mouse::Left)))
+		{
+			
 		}
 
 		if (window.hasFocus())
@@ -44,6 +61,8 @@ int main()
 				player.right();
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 				player.jump();
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+				player.down();
 		}
 
 		window.clear(sf::Color(135, 206, 235));

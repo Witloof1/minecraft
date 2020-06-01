@@ -25,12 +25,23 @@ World::World()
 	fDirtSeed.reserve(nSeedSize);
 	fStoneSeed.reserve(nSeedSize);
 
+	brokenBlocks.reserve(100);
+
 	std::cout << "nSeedSize: " << nSeedSize << std::endl;
 	std::cout << "nVisibleBlocksX: " << nVisibleBlocksX << std::endl;
 	std::cout << "nScreenWidth: " << nScreenWidth << std::endl;
 
+	if(!t1.loadFromFile("resources/textures/blocks/dirt.jpg"))
+		std::cout << "Faile to load dirt" << std::endl;
 
-	block.setSize({ (float)nBlockWidth, (float)nBlockHeight });
+	if(!t2.loadFromFile("resources/textures/blocks/stone.jpeg"))
+		std::cout << "Faile to load stone" << std::endl;
+
+	dirt.setTexture(t1);
+	stone.setTexture(t2);
+
+	dirt.setScale((float)nBlockWidth / t1.getSize().x, (float)nBlockHeight / t1.getSize().y);
+	stone.setScale((float)nBlockWidth / t2.getSize().x, (float)nBlockHeight / t2.getSize().y);
 }
 
 World::~World()
@@ -49,6 +60,12 @@ void World::setBlock(int x, int y, int8_t blockID)
 {
 	if (x >= 0 && x < nWorldWidth && y >= 0 && y < nWorldHeight)
 		nWorld[y * nWorldWidth + x] = blockID;
+}
+
+void World::breakBlock(int x, int y)
+{
+	std::cout << "block broken at: (" << (int)vOffset.x + x << ", " << y << ")" << std::endl;
+	brokenBlocks.push_back({(int)vOffset.x + x, y});
 }
 
 void World::fillSeed(std::vector<float>& fSeed, int min, int max, int nOffset)
@@ -96,30 +113,34 @@ void World::generateTerrain(const int& nPlayerPosX)
 
 		}
 	}
+
+	for (const sf::Vector2i& block : brokenBlocks)
+		setBlock(block.x - (int)vOffset.x, block.y, 0);
 }
 
 void World::displayWorld(sf::RenderWindow& window)
 {
-	for (int x = 0; x < nVisibleBlocksX + 1; x++)
+	for (int x = -1; x < nVisibleBlocksX + 1; x++)
 	{
 		for (int y = 0; y < nVisibleBlocksY + 2; y++)
 		{
 			int8_t nTileID = getBlock(x, y + vOffset.y);
-			block.setPosition(x * nBlockWidth - vBlockOffset.x, y * nBlockHeight - vBlockOffset.y);
-			block.setOutlineThickness(1);
 			switch (nTileID)
 			{
 				case 0:
 					break;
 				case 1:
-					block.setFillColor(sf::Color(139, 69, 19)); // dirt
-					window.draw(block);
+					dirt.setPosition(x * nBlockWidth - vBlockOffset.x, y * nBlockHeight - vBlockOffset.y);
+					window.draw(dirt);
 					break;
 				case 2:
-					block.setFillColor(sf::Color(128, 128, 128)); // stone
-					window.draw(block);
+					stone.setPosition(x * nBlockWidth - vBlockOffset.x, y * nBlockHeight - vBlockOffset.y);
+					window.draw(stone);
 					break;
 				default:
+					sf::RectangleShape block({ (float)nBlockWidth, (float)nBlockHeight });
+					block.setPosition(x * nBlockWidth - vBlockOffset.x, y * nBlockHeight - vBlockOffset.y);
+					block.setOutlineThickness(1);
 					block.setFillColor(sf::Color::Red);
 					window.draw(block);
 			}
