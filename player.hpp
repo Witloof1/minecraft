@@ -18,8 +18,9 @@ public:
 
 	void move();
 	void collision(const float& fElapsedTime);
-	void defineRayAngle(sf::Vector2f vMouse);
+	void calculateRayAngle(sf::Vector2f vMouse);
 	void castRay();
+	void breakBlock();
 	void display(sf::RenderWindow& window);
 
 private:
@@ -37,8 +38,11 @@ private:
 	float fMaxReachability = 7.0f;
 	float fRayAngle;
 
-	sf::Vector2f vTestPoint;
+	sf::Vector2f vEndOfRay;
+
 	void drawRay(sf::RenderWindow& window);
+
+	int8_t nSelectedBlock = 1;
 
 	sf::RectangleShape playerRect;
 };

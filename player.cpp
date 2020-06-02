@@ -92,7 +92,7 @@ void Player::collision(const float& fElapsedTime)
 	vPos.y = fNewPosY;
 }
 
-void Player::defineRayAngle(sf::Vector2f vMouse)
+void Player::calculateRayAngle(sf::Vector2f vMouse)
 {
 	sf::Vector2f vToMouse = vMouse - vScreenPos;
 	sf::Vector2f vUp { 0.0f, 1.0f };
@@ -102,33 +102,42 @@ void Player::defineRayAngle(sf::Vector2f vMouse)
 
 void Player::castRay()
 {
-	for (float fProg = 0.0f; fProg < fMaxReachability; fProg+=0.5)
+	sf::Vector2f vTestPoint;
+	for (float fProg = 0.0f; fProg < fMaxReachability; fProg+=0.1)
 	{
 		vTestPoint.x = vPos.x - world.offset().x + cos(fRayAngle) * fProg;
 		vTestPoint.y = vPos.y + sin(fRayAngle) * fProg;
 
 		if (world.getBlock(vTestPoint.x, vTestPoint.y) != 0)
-		{
-			world.breakBlock(vTestPoint.x , vTestPoint.y);
 			break;
-		}
 	}
+
+	vEndOfRay = vTestPoint;
+}
+
+void Player::breakBlock()
+{
+	world.breakBlock(vEndOfRay.x, vEndOfRay.y);
 }
 
 void Player::drawRay(sf::RenderWindow& window)
 {
 	sf::Vertex ray[2]
 	{
-		sf::Vertex(vScreenPos + sf::Vector2f(playerRect.getSize().x / 2, playerRect.getSize().y / 2)),
-		sf::Vertex({ vTestPoint.x * world.blockSize().x, (vTestPoint.y - world.offset().y) * world.blockSize().y})
+		sf::Vertex(vScreenPos),
+		sf::Vertex({ vEndOfRay.x * world.blockSize().x, (vEndOfRay.y - world.offset().y) * world.blockSize().y })
 	};
+
+	sf::CircleShape circle(10, 12);
+	circle.setPosition(vEndOfRay.x * world.blockSize().x - 5, (vEndOfRay.y - world.offset().y) * world.blockSize().y - 5);
+	window.draw(circle);
 
 	window.draw(ray, 2, sf::Lines);
 }
 
 void Player::display(sf::RenderWindow& window)
 {
-	playerRect.setPosition((vPos.x - world.offset().x) * world.blockSize().x, (vPos.y - world.offset().y) * world.blockSize().y);
+	playerRect.setPosition(vScreenPos);
 	window.draw(playerRect); 
 
 	drawRay(window);

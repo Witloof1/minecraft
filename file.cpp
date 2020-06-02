@@ -26,6 +26,7 @@ World::World()
 	fStoneSeed.reserve(nSeedSize);
 
 	brokenBlocks.reserve(100);
+	placedBlocks.reserve(100);
 
 	std::cout << "nSeedSize: " << nSeedSize << std::endl;
 	std::cout << "nVisibleBlocksX: " << nVisibleBlocksX << std::endl;
@@ -116,6 +117,9 @@ void World::generateTerrain(const int& nPlayerPosX)
 
 	for (const sf::Vector2i& block : brokenBlocks)
 		setBlock(block.x - (int)vOffset.x, block.y, 0);
+
+	for (const sf::Vector3i& block : placedBlocks)
+		setBlock(block.x - (int)vOffset.x, block.y, block.z);
 }
 
 void World::displayWorld(sf::RenderWindow& window)

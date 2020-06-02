@@ -42,15 +42,7 @@ int main()
 				window.close();
 			if (event.type == sf::Event::MouseButtonPressed)
 				if (event.mouseButton.button == sf::Mouse::Left)
-               	{
-               		player.defineRayAngle(vMouse);
-					player.castRay();
-				}
-		}
-
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Button(sf::Mouse::Left)))
-		{
-			
+					player.breakBlock();
 		}
 
 		if (window.hasFocus())
@@ -73,10 +65,14 @@ int main()
 		
 		world.calculateOffsets(player.pos());
 		world.generateTerrain(player.pos().x);
+		
 		world.displayWorld(window);
-
 		player.display(window);
 
+		player.calculateRayAngle(vMouse);
+		player.castRay();
+
+		
 		// for debugging: display fElapsedTime
 		std::stringstream ss;
 		ss << "Elapsed time: " << fElapsedTime;

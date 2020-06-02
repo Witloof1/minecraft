@@ -20,6 +20,7 @@ public:
 
 	sf::Vector2f blockSize() const { return { (float)nBlockWidth, (float)nBlockHeight }; }
 	sf::Vector2f offset() const { return vOffset; }
+	sf::Vector2f blockOffset() const { return vBlockOffset; }
 
 	void calculateOffsets(const sf::Vector2f&);
 	void generateTerrain(const int&);
@@ -39,7 +40,7 @@ private:
 	const int nWorldHeight = 128;
 	
 	const int nSeedPointsDist = 40;
-	const int nSeedSize = nWorldWidth / nSeedPointsDist + 3;
+	const int nSeedSize = nWorldWidth / nSeedPointsDist + 4;
 
 	int8_t* nWorld;
 	std::vector<float> fDirtSeed;
@@ -51,6 +52,7 @@ private:
 	void fillSeed(std::vector<float>&, int, int, int);
 
 	std::vector<sf::Vector2i> brokenBlocks;
+	std::vector<sf::Vector3i> placedBlocks;
 
 	sf::Texture t1;
 	sf::Sprite dirt;
